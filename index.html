@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Absensi Digital | SMP Negeri 1 Sukasada</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            primary: {
+              50: '#f0f9ff',
+              100: '#e0f2fe',
+              200: '#bae6fd',
+              300: '#7dd3fc',
+              400: '#38bdf8',
+              500: '#0ea5e9',
+              600: '#0284c7',
+              700: '#0369a1',
+              800: '#075985',
+              900: '#0c4a6e',
+            },
+            secondary: {
+              50: '#f8fafc',
+              100: '#f1f5f9',
+              200: '#e2e8f0',
+              300: '#cbd5e1',
+              400: '#94a3b8',
+              500: '#64748b',
+              600: '#475569',
+              700: '#334155',
+              800: '#1e293b',
+              900: '#0f172a',
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    .toast {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      animation: slideIn 0.3s, fadeOut 0.3s 1s forwards;
+      z-index: 1000;
+    }
+    
+    @keyframes slideIn {
+      from { transform: translate(-50%, -40px); opacity: 0; }
+      to { transform: translate(-50%, -50%); opacity: 1; }
+    }
+    
+    @keyframes fadeOut {
+      from { opacity: 1; }
+      to { opacity: 0; }
+    }
+    
+    .status-option:hover .status-icon {
+      transform: scale(1.1);
+    }
+    
+    .status-icon {
+      transition: transform 0.2s ease;
+    }
+    
+    .loading-spinner {
+      border: 3px solid rgba(255, 255, 255, 0.3);
+      border-radius: 50%;
+      border-top: 3px solid #ffffff;
+      width: 20px;
+      height: 20px;
+      animation: spin 1s linear infinite;
+      display: inline-block;
+      vertical-align: middle;
+      margin-left: 8px;
+    }
+    
+    @keyframes spin {
+      0% { transform: rotate(0deg); }
+      100% { transform: rotate(360deg); }
+    }
+    
+    .glass-card {
+      background: rgba(255, 255, 255, 0.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      border-radius: 16px;
+      box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+    
+    .gradient-header {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+    }
+    
+    .gradient-footer {
+      background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+    }
+    
+    .gradient-card {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+    }
+    
+    .gradient-button {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+      transition: all 0.3s ease;
+    }
+    
+    .gradient-button:hover {
+      background: linear-gradient(135deg, #0284c7 0%, #0369a1 100%);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(2, 132, 199, 0.3);
+    }
+    
+    .gradient-button:active {
+      transform: translateY(0);
+    }
+    
+    .gradient-input {
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      border: 1px solid #e2e8f0;
+      transition: all 0.3s ease;
+    }
+    
+    .gradient-input:focus {
+      border-color: #7dd3fc;
+      box-shadow: 0 0 0 3px rgba(125, 211, 252, 0.3);
+    }
+    
+    .status-hadir {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+    }
+    
+    .status-sakit {
+      background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    }
+    
+    .status-izin {
+      background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    }
+    
+    .status-alpha {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+    }
+    
+    .status-hover {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .status-option:hover .status-card {
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .status-card {
+      transition: all 0.3s ease;
+    }
+    
+    .school-logo {
+      height: 60px;
+      width: auto;
+      object-fit: contain;
+      animation: pulse 2s infinite, float 6s ease-in-out infinite;
+      filter: drop-shadow(0 0 8px rgba(14, 165, 233, 0.4));
+      transition: all 0.3s ease;
+    }
+    
+    .school-logo:hover {
+      animation: pulse 1s infinite, float 4s ease-in-out infinite, rotate 8s linear infinite;
+      filter: drop-shadow(0 0 12px rgba(14, 165, 233, 0.6));
+    }
+    
+    @keyframes pulse {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.05); }
+      100% { transform: scale(1); }
+    }
+    
+    @keyframes float {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-8px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    @keyframes rotate {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(5deg); }
+      50% { transform: rotate(0deg); }
+      75% { transform: rotate(-5deg); }
+      100% { transform: rotate(0deg); }
+    }
+    
+    .main-bg {
+      background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%);
+    }
+    
+    .card-glow {
+      box-shadow: 0 10px 25px -5px rgba(14, 165, 233, 0.1), 0 10px 10px -5px rgba(14, 165, 233, 0.04);
+    }
+    
+    .floating {
+      animation: floating 3s ease-in-out infinite;
+    }
+    
+    @keyframes floating {
+      0% { transform: translateY(0px); }
+      50% { transform: translateY(-10px); }
+      100% { transform: translateY(0px); }
+    }
+    
+    .text-gradient {
+      background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    
+    .border-gradient {
+      border: 2px solid transparent;
+      background: linear-gradient(white, white) padding-box,
+                  linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%) border-box;
+    }
+    
+    .logo-container {
+      position: relative;
+      display: inline-block;
+    }
+    
+    .logo-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(14, 165, 233, 0.2) 0%, rgba(255, 255, 255, 0) 70%);
+      animation: ripple 3s infinite;
+      z-index: -1;
+    }
+    
+    @keyframes ripple {
+      0% {
+        transform: scale(0.8);
+        opacity: 1;
+      }
+      100% {
+        transform: scale(1.5);
+        opacity: 0;
+      }
+    }
+    
+    /* Updated home button style */
+    .home-button {
+      position: absolute;
+      top: 10px;
+      right: 20px;
+      z-index: 50;
+      background: linear-gradient(135deg, #0ea5e9 0%, #0369a1 100%);
+      padding: 8px 16px;
+      border-radius: 8px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 4px 15px rgba(14, 165, 233, 0.4);
+      transition: all 0.3s ease;
+      color: white;
+      font-size: 14px;
+      text-decoration: none;
+    }
+    
+    .home-button:hover {
+      transform: translateY(-2px) scale(1.05);
+      box-shadow: 0 8px 20px rgba(14, 165, 233, 0.6);
+    }
+    
+    .home-button:active {
+      transform: translateY(0) scale(0.98);
+    }
+  </style>
+</head>
+<body class="main-bg min-h-screen flex flex-col">
+  <!-- Header with School Branding -->
+  <header class="gradient-header text-white shadow-lg relative overflow-hidden">
+    <div class="absolute inset-0 bg-gradient-to-r from-primary-600/10 to-primary-800/10"></div>
+    <div class="container mx-auto px-4 py-6 relative z-10">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center space-x-4">
+          <img src="https://i.ibb.co.com/3YjdDh2N/logo-sekolah-FINAL.png" alt="Logo SMPN 1 Sukasada" class="school-logo">
+          <div>
+            <h1 class="text-2xl font-bold">SMP NEGERI 1 SUKASADA</h1>
+            <p class="text-primary-200">Menuju Era Digital</p>
+          </div>
+        </div>
+        <div class="hidden md:block glass-card px-4 py-2 backdrop-blur-md">
+          <p class="text-primary-100"><i class="fas fa-calendar-day mr-2"></i> <span id="current-date"></span></p>
+          <p class="text-primary-100"><i class="fas fa-clock mr-2"></i> <span id="current-time"></span></p>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Content -->
+  <main class="flex-grow container mx-auto px-4 py-8">
+    <div class="max-w-3xl mx-auto">
+      <!-- Floating decorative elements -->
+      <div class="absolute top-20 left-10 w-16 h-16 rounded-full bg-primary-100/20 blur-xl"></div>
+      <div class="absolute bottom-1/4 right-10 w-24 h-24 rounded-full bg-primary-200/20 blur-xl"></div>
+      
+      <!-- Attendance Card -->
+      <div class="gradient-card rounded-xl shadow-xl overflow-hidden mb-8 border border-gray-100 card-glow relative z-10">
+        <!-- Home button positioned above the header -->
+        <a href="https://pujana2207.github.io/LANDING-PAGE-PRESENSI-DIGITAL-SPENSADA/" class="home-button">
+          <i class="fas fa-home mr-2"></i> KEMBALI KE HALAMAN UTAMA
+        </a>
+        
+        <div class="gradient-header px-6 py-4 relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-primary-500/10 to-primary-700/10"></div>
+          <h2 class="text-xl font-semibold text-white relative z-10">ABSENSI DIGITAL</h2>
+        </div>
+        
+        <div class="p-6">
+          <!-- Search Form -->
+          <div class="mb-6">
+            <label for="nis" class="block text-gray-700 font-medium mb-2">Masukkan Nomor Induk Siswa</label>
+            <div class="flex space-x-2">
+              <input 
+                type="text" 
+                id="nis" 
+                placeholder="Contoh: 12345" 
+                class="flex-grow px-4 py-3 gradient-input rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-primary-500 border border-gray-200"
+                onkeypress="handleEnterKey(event)"
+              >
+              <button 
+                onclick="cariSiswa()" 
+                id="search-button"
+                class="gradient-button text-white px-6 py-3 rounded-lg flex items-center shadow-md hover:shadow-lg transition-all"
+              >
+                <i class="fas fa-search mr-2"></i> Cari
+              </button>
+            </div>
+          </div>
+          
+          <!-- Student Info (Hidden by default) -->
+          <div id="info-siswa" class="hidden bg-gradient-to-br from-primary-50 to-primary-100 rounded-lg p-6 mb-6 border border-primary-200">
+            <h3 class="text-lg font-semibold text-primary-800 mb-4">Data Siswa</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                <p class="text-gray-600 text-sm">Nama Lengkap</p>
+                <p id="nama" class="font-medium text-gray-800 text-lg"></p>
+              </div>
+              <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+                <p class="text-gray-600 text-sm">Kelas</p>
+                <p id="kelas" class="font-medium text-gray-800 text-lg"></p>
+              </div>
+            </div>
+            
+            <div class="mt-6">
+              <h4 class="text-gray-700 font-medium mb-4">Status Kehadiran</h4>
+              <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                <!-- Hadir -->
+                <label class="status-option cursor-pointer">
+                  <input type="radio" name="status" value="H" onclick="submitAbsen()" class="hidden">
+                  <div class="status-hadir rounded-lg p-4 text-center transition-all duration-300 status-card hover:shadow-lg">
+                    <div class="status-icon text-white text-3xl mb-2">
+                      <i class="fas fa-check-circle"></i>
+                    </div>
+                    <span class="text-white font-medium">Hadir</span>
+                  </div>
+                </label>
+                
+                <!-- Sakit -->
+                <label class="status-option cursor-pointer">
+                  <input type="radio" name="status" value="S" onclick="submitAbsen()" class="hidden">
+                  <div class="status-sakit rounded-lg p-4 text-center transition-all duration-300 status-card hover:shadow-lg">
+                    <div class="status-icon text-white text-3xl mb-2">
+                      <i class="fas fa-procedures"></i>
+                    </div>
+                    <span class="text-white font-medium">Sakit</span>
+                  </div>
+                </label>
+                
+                <!-- Izin -->
+                <label class="status-option cursor-pointer">
+                  <input type="radio" name="status" value="I" onclick="submitAbsen()" class="hidden">
+                  <div class="status-izin rounded-lg p-4 text-center transition-all duration-300 status-card hover:shadow-lg">
+                    <div class="status-icon text-white text-3xl mb-2">
+                      <i class="fas fa-envelope"></i>
+                    </div>
+                    <span class="text-white font-medium">Izin</span>
+                  </div>
+                </label>
+                
+                <!-- Alpha -->
+                <label class="status-option cursor-pointer">
+                  <input type="radio" name="status" value="A" onclick="submitAbsen()" class="hidden">
+                  <div class="status-alpha rounded-lg p-4 text-center transition-all duration-300 status-card hover:shadow-lg">
+                    <div class="status-icon text-white text-3xl mb-2">
+                      <i class="fas fa-times-circle"></i>
+                    </div>
+                    <span class="text-white font-medium">Alpha</span>
+                  </div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Attendance History -->
+      <div class="gradient-card rounded-xl shadow-xl overflow-hidden border border-gray-100 card-glow relative z-10">
+        <div class="bg-gradient-to-r from-secondary-800 to-secondary-700 px-6 py-4 relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-secondary-700/10 to-secondary-900/10"></div>
+          <h3 class="text-xl font-semibold text-white relative z-10">RIWAYAT ABSEN TERAKHIR</h3>
+        </div>
+        <div class="p-6">
+          <div id="riwayat" class="text-gray-600 italic">Belum ada data absensi</div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Toast Notification (Hidden by default) -->
+    <div id="toast" class="toast hidden">
+      <div class="bg-gradient-to-r from-green-500 to-green-600 text-white px-8 py-4 rounded-xl shadow-xl flex items-center backdrop-blur-sm">
+        <i class="fas fa-check-circle mr-3 text-2xl"></i>
+        <span id="toast-message" class="text-lg font-medium"></span>
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="gradient-footer text-white py-6 relative overflow-hidden">
+      <div class="mt-4 pt-4 border-t border-gray-700 text-center text-gray-400 text-sm">
+        <p>&copy; 2023 SMP Negeri 1 Sukasada. All rights reserved. Gede Pujana</p>
+      </div>
+  </footer>
+
+  <script>
+    const scriptURL = "https://script.google.com/macros/s/AKfycbwdLrbbMF1MG8aq1b9Qc0bJ7aQLvS7sjsqk4DKErWQjr_ImYS9-afXhbHWssPNMThM/exec"; // Ganti ini
+
+    let currentSiswa = {};
+    
+    // Update current date and time
+    function updateDateTime() {
+      const now = new Date();
+      document.getElementById('current-date').textContent = now.toLocaleDateString('id-ID', { 
+        weekday: 'long', 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric' 
+      });
+      document.getElementById('current-time').textContent = now.toLocaleTimeString('id-ID');
+    }
+    
+    setInterval(updateDateTime, 100);
+    updateDateTime();
+    
+    // Show toast notification
+    function showToast(message) {
+      const toast = document.getElementById('toast');
+      const toastMessage = document.getElementById('toast-message');
+      
+      toastMessage.textContent = message;
+      toast.classList.remove('hidden');
+      
+      // Hide after 1 second
+      setTimeout(() => {
+        toast.classList.add('hidden');
+      }, 1000);
+    }
+
+    // Handle Enter key press in NIS input
+    function handleEnterKey(event) {
+      if (event.key === 'Enter') {
+        cariSiswa();
+      }
+    }
+
+    function cariSiswa() {
+      const nis = document.getElementById("nis").value;
+      const searchButton = document.getElementById("search-button");
+      
+      if (!nis) {
+        showToast("Silakan masukkan NIS terlebih dahulu");
+        return;
+      }
+      
+      // Show loading state
+      searchButton.innerHTML = '<i class="fas fa-spinner fa-spin mr-2"></i> Memuat...';
+      searchButton.disabled = true;
+      
+      fetch(scriptURL, {
+        method: "POST",
+        body: JSON.stringify({ action: "getSiswa", nis: nis })
+      })
+      .then(res => res.json())
+      .then(data => {
+        if (data.error) {
+          showToast(data.error);
+        } else {
+          currentSiswa = { nis: nis, nama: data.nama, kelas: data.kelas };
+          document.getElementById("nama").textContent = data.nama;
+          document.getElementById("kelas").textContent = data.kelas;
+          document.getElementById("info-siswa").style.display = "block";
+          document.getElementById("info-siswa").classList.remove("hidden");
+        }
+      })
+      .catch(error => {
+        showToast("Terjadi kesalahan saat mencari data siswa");
+        console.error("Error:", error);
+      })
+      .finally(() => {
+        // Reset button state
+        searchButton.innerHTML = '<i class="fas fa-search mr-2"></i> Cari';
+        searchButton.disabled = false;
+      });
+    }
+
+    function submitAbsen() {
+      const status = document.querySelector('input[name="status"]:checked');
+      if (!status) return;
+
+      fetch(scriptURL, {
+        method: "POST",
+        body: JSON.stringify({
+          action: "submitAbsen",
+          nis: currentSiswa.nis,
+          nama: currentSiswa.nama,
+          kelas: currentSiswa.kelas,
+          status: status.value
+        })
+      })
+      .then(res => res.text())
+      .then(msg => {
+        const statusText = {
+          'H': 'Hadir',
+          'S': 'Sakit',
+          'I': 'Izin',
+          'A': 'Alpha'
+        };
+        
+        showToast(`Absen berhasil: ${statusText[status.value]}`);
+        tampilkanRiwayat(currentSiswa.nis, currentSiswa.nama);
+        document.getElementById("info-siswa").style.display = "none";
+        document.getElementById("info-siswa").classList.add("hidden");
+        document.getElementById("nis").value = "";
+        document.querySelectorAll('input[name="status"]').forEach(r => r.checked = false);
+      })
+      .catch(error => {
+        showToast("Gagal menyimpan absensi");
+        console.error("Error:", error);
+      });
+    }
+
+    function tampilkanRiwayat(nis, nama) {
+      const now = new Date();
+      const formattedDate = now.toLocaleDateString('id-ID', { 
+        day: 'numeric', 
+        month: 'long', 
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      });
+      
+      document.getElementById("riwayat").innerHTML = `
+        <div class="bg-white p-4 rounded-lg shadow-sm border border-gray-100">
+          <div class="flex justify-between items-center mb-2">
+            <h4 class="font-medium text-gray-800">${nama}</h4>
+            <span class="text-sm text-gray-500">${formattedDate}</span>
+          </div>
+          <p class="text-sm text-gray-600">NIS: ${nis}</p>
+        </div>
+      `;
+    }
+  </script>
+</body>
+</html>
